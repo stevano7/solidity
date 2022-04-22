@@ -118,6 +118,7 @@ contract Reservasi {
                 jmlKamar--;
                 _hotel.transfer(msg.value);
                 emit reserve(noKTP, msg.value);
+                isiData = false;
          }
 
          function cekJmlKamar() public view returns (uint) {
