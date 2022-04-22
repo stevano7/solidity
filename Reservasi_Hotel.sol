@@ -55,6 +55,7 @@ contract DataVaksin {
 contract Reservasi {
 
          uint private jmlKamar;
+         uint private tarif;
          string public noKTP;
          string public nama;
          uint public statusVaksin;
@@ -62,8 +63,9 @@ contract Reservasi {
 
          event reserve(string noKTP, uint harga);
 
-        constructor(uint _jmlKamar) {
+        constructor(uint _jmlKamar, uint _tarif) {
             jmlKamar = _jmlKamar;
+            tarif = _tarif;
             isiData = false;
         }
 
@@ -105,9 +107,14 @@ contract Reservasi {
              _;
          }
 
+         modifier cekEther() {
+                require(msg.value >= tarif, "Ether tidak cukup");
+                _;
+        }
 
 
-         function pesanKamar(address payable _hotel) payable public cekKamar cekisiData cekStatVak {
+
+         function pesanKamar(address payable _hotel) payable public cekKamar cekisiData cekStatVak cekEther {
                 jmlKamar--;
                 _hotel.transfer(msg.value);
                 emit reserve(noKTP, msg.value);
