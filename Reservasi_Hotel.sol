@@ -60,6 +60,8 @@ contract Reservasi {
          string public nama;
          uint public statusVaksin;
          bool private isiData;
+         address addr = 0xD4Fc541236927E2EAf8F27606bD7309C1Fc2cbee;
+         DataVaksin _datavac = DataVaksin(addr);
 
          event reserve(string noKTP, uint harga);
 
@@ -72,7 +74,6 @@ contract Reservasi {
 
         function setDataPemesan(string memory _noKTP, string memory _nama) public {
 
-                    DataVaksin _datavac;
                     noKTP = _noKTP;
                     nama = _nama;
                     statusVaksin = _datavac.getStatusVaksin(_noKTP);
