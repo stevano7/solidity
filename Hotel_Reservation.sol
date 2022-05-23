@@ -11,29 +11,34 @@ contract Reservation {
          uint private rate;
          uint private guestCount;
          uint private pay;
+         uint private token;
+         uint private HTK;
          string public guestId;
          string public guestName;
          uint private vaccineStat;
          uint private duration;
          bool private isFilled;
+         bool public usingHTK;
          address payable private hotel;
-         address vacDatAddr = 0x9C9fF5DE0968dF850905E74bAA6a17FED1Ba042a;
-         address guestAddr = 0xddaAd340b0f1Ef65169Ae5E41A8b10776a75482d;
-         address tknAddr = 0xd2a5bC10698FD955D1Fe6cb468a17809A08fd005;
+         address vacDatAddr = 0xa131AD247055FD2e2aA8b156A11bdEc81b9eAD95;
+         address guestAddr = 0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8;
+         address tknAddr = 0xd9145CCE52D386f254917e481eB44e9943F39138;
          VaccineData _vacdata = VaccineData(vacDatAddr);
          GuestData _guestdata = GuestData(guestAddr);
          HotelToken _hotelTkn = HotelToken(tknAddr);
         
          event bookdata(string Guest_Id, string Guest_Name, uint Check_In_Date, uint Check_Out_Date);
-         event reserve(string Guest_Id, string Guest_Name, string Booking_Code, uint Paid);
+         event reserve(string Guest_Id, string Guest_Name, string Booking_Code, uint Paid, uint HTK);
         
 
-        constructor(uint _rooms, uint _rate) {
+        constructor(uint _rooms, uint _rate, uint _token) {
             rooms = _rooms;
             rate = _rate;
+            token = _token;
             hotel = msg.sender;
             guestCount = 0;
             isFilled = false;
+            usingHTK = false;
         }
 
 
@@ -82,7 +87,8 @@ contract Reservation {
                     guestName = _guestName;
                     vaccineStat = _vacdata.getVaccineStat(_guestId); 
                     duration = _checkOutDate - _checkInDate;
-                    pay = rate * duration;         
+                    pay = rate * duration;
+                    HTK = token * duration;        
                     isFilled = true;
 
                     emit bookdata(guestId, guestName, _checkInDate, _checkOutDate);
@@ -113,35 +119,46 @@ contract Reservation {
          modifier checkVaccStat() {
              require (vaccineStat != 0, "You Are Not Vaccinated");
              _;
-         }
+         }      
 
-         modifier checkBalance() {
-                require(msg.value >= pay, "Not Enough Balance");
-                _;
+        function setUsingHTK() public {
+
+                require((_hotelTkn.balanceOf(msg.sender)) >= HTK, "Not Enough HTK");
+                usingHTK = true;
         }
 
         function generateBookingCode(uint _index) private pure returns (string memory) {
 
-              string[5] memory code1 = ["G-A001","G-B002","G-C125","G-X337","G-J940"];
+              string[10] memory code1 = ["G-A001","G-B002","G-C125","G-X337","G-J940",
+                                        "G-Y357","G-U404","G-W972","G-Z666","G-Q234"];
 
               return code1[_index];
 
         }
 
 
-         function bookRoom() payable public checkRoom checkisFilled checkBalance checkVaccStat {
+         function bookRoom() payable public checkRoom checkisFilled checkVaccStat {
 
              string memory bookCode;
 
+                if (usingHTK) {
+
+                    _hotelTkn.trfToken(msg.sender, hotel, HTK);
+
+                } else {
+                    
+                     require(msg.value >= pay, "Not Enough Balance");
+                     hotel.transfer(msg.value);
+                    _hotelTkn.mint(msg.sender, 1);
+                }         
+               
+
                 rooms--;
-                //_hotelTkn.trfToken(msg.sender, hotel,3);;
-                hotel.transfer(msg.value);
-                _hotelTkn.mint(msg.sender, 1);
                 bookCode = generateBookingCode(guestCount);
                 isFilled = false;
                 _guestdata.inputGuest(block.timestamp, guestId, guestName, bookCode, msg.sender, _hotelTkn.balanceOf(msg.sender));
                 guestCount++;
-                 emit reserve(guestId, guestName, bookCode, msg.value);
+                 emit reserve(guestId, guestName, bookCode, msg.value, HTK);
 
                 
          }
@@ -152,6 +169,10 @@ contract Reservation {
 
          function getPay() public view returns (uint) {
              return pay;
+         }
+
+         function getHTK() public view returns (uint) {
+             return HTK;
          }
 
          function checkOut() public {
