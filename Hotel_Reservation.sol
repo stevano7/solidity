@@ -134,7 +134,7 @@ contract Reservation {
              string memory bookCode;
 
                 rooms--;
-                //_hotelTkn.trfToken(hotel,3);
+                //_hotelTkn.trfToken(msg.sender, hotel,3);;
                 hotel.transfer(msg.value);
                 _hotelTkn.mint(msg.sender, 1);
                 bookCode = generateBookingCode(guestCount);
