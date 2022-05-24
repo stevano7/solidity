@@ -151,6 +151,7 @@ contract Reservation {
                      require(msg.value >= pay, "Not Enough Balance");
                      hotel.transfer(msg.value);
                     _hotelTkn.mint(msg.sender, 1);
+                     HTK = 0;
                 }         
                
 
