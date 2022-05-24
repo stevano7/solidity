@@ -144,6 +144,7 @@ contract Reservation {
                 if (usingHTK) {
 
                     _hotelTkn.trfToken(msg.sender, hotel, HTK);
+                    usingHTK = false;
 
                 } else {
                     
