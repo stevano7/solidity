@@ -18,11 +18,10 @@ contract Reservation {
          bool private isFilled;
          address payable private hotel;
          address vacDatAddr = 0xa131AD247055FD2e2aA8b156A11bdEc81b9eAD95;
-         address guestAddr = 0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8;
-         address tknAddr = 0xd9145CCE52D386f254917e481eB44e9943F39138;
+         address tknAddr = 0x99CF4c4CAE3bA61754Abd22A8de7e8c7ba3C196d;
          VaccineData _vacdata = VaccineData(vacDatAddr);
-         GuestData _guestdata = GuestData(guestAddr);
          HotelToken _hotelTkn = HotelToken(tknAddr);
+         GuestData _guestdata = new GuestData();
         
          event bookdata(string Guest_Id, string Guest_Name, uint Check_In_Date, uint Check_Out_Date);
          event reserve(string Guest_Id, string Guest_Name, string Booking_Code, uint HTK);
@@ -131,13 +130,9 @@ contract Reservation {
 
              string memory bookCode;
 
-              
-
+                 require((_hotelTkn.balanceOf(msg.sender)) >= HTK, "Not Enough HTK");
                 _hotelTkn.trfToken(msg.sender, hotel, HTK);
-                       
-                require((_hotelTkn.balanceOf(msg.sender)) >= HTK, "Not Enough HTK");
-                
-               
+                          
                 rooms--;
                 bookCode = generateBookingCode(guestCount);
                 isFilled = false;
