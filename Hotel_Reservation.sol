@@ -8,9 +8,7 @@ import "./Hotel_Token.sol";
 contract Reservation {
 
          uint private rooms;
-         uint private rate;
          uint private guestCount;
-         uint private pay;
          uint private token;
          uint private HTK;
          string public guestId;
@@ -18,7 +16,6 @@ contract Reservation {
          uint private vaccineStat;
          uint private duration;
          bool private isFilled;
-         bool public usingHTK;
          address payable private hotel;
          address vacDatAddr = 0xa131AD247055FD2e2aA8b156A11bdEc81b9eAD95;
          address guestAddr = 0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8;
@@ -28,17 +25,15 @@ contract Reservation {
          HotelToken _hotelTkn = HotelToken(tknAddr);
         
          event bookdata(string Guest_Id, string Guest_Name, uint Check_In_Date, uint Check_Out_Date);
-         event reserve(string Guest_Id, string Guest_Name, string Booking_Code, uint Paid, uint HTK);
+         event reserve(string Guest_Id, string Guest_Name, string Booking_Code, uint HTK);
         
 
-        constructor(uint _rooms, uint _rate, uint _token) {
+        constructor(uint _rooms, uint _token) {
             rooms = _rooms;
-            rate = _rate;
             token = _token;
             hotel = msg.sender;
             guestCount = 0;
             isFilled = false;
-            usingHTK = false;
         }
 
 
@@ -87,7 +82,6 @@ contract Reservation {
                     guestName = _guestName;
                     vaccineStat = _vacdata.getVaccineStat(_guestId); 
                     duration = _checkOutDate - _checkInDate;
-                    pay = rate * duration;
                     HTK = token * duration;        
                     isFilled = true;
 
@@ -121,11 +115,7 @@ contract Reservation {
              _;
          }      
 
-        function setUsingHTK() public {
-
-                require((_hotelTkn.balanceOf(msg.sender)) >= HTK, "Not Enough HTK");
-                usingHTK = true;
-        }
+        
 
         function generateBookingCode(uint _index) private pure returns (string memory) {
 
@@ -137,43 +127,32 @@ contract Reservation {
         }
 
 
-         function bookRoom() payable public checkRoom checkisFilled checkVaccStat {
+         function bookRoom() public checkRoom checkisFilled checkVaccStat {
 
              string memory bookCode;
 
-                if (usingHTK) {
+              
 
-                    _hotelTkn.trfToken(msg.sender, hotel, HTK);
-                    usingHTK = false;
-
-                } else {
-                    
-                     require(msg.value >= pay, "Not Enough Balance");
-                     hotel.transfer(msg.value);
-                    _hotelTkn.mint(msg.sender, 1);
-                     HTK = 0;
-                }         
+                _hotelTkn.trfToken(msg.sender, hotel, HTK);
+                       
+                require((_hotelTkn.balanceOf(msg.sender)) >= HTK, "Not Enough HTK");
+                
                
-
                 rooms--;
                 bookCode = generateBookingCode(guestCount);
                 isFilled = false;
-                _guestdata.inputGuest(block.timestamp, guestId, guestName, bookCode, msg.sender, _hotelTkn.balanceOf(msg.sender));
+                _guestdata.inputGuest(block.timestamp, guestId, guestName, bookCode, msg.sender);
                 guestCount++;
-                 emit reserve(guestId, guestName, bookCode, msg.value, HTK);
+                 emit reserve(guestId, guestName, bookCode, HTK);
 
                 
          }
 
-         function getRooms() public view returns (uint) {
+         function getAvailableRooms() public view returns (uint) {
              return rooms;
          }
 
-         function getPay() public view returns (uint) {
-             return pay;
-         }
-
-         function getHTK() public view returns (uint) {
+         function getTotalHTK() public view returns (uint) {
              return HTK;
          }
 
