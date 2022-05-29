@@ -24,7 +24,7 @@ contract VaccineData {
         mapping (string => vaccineStatus) private VacsMap;
 
       
-
+        // Input the data of the person
         function createVaccinee(string memory _vaccineeId, string memory _vaccineeName) public {
 
             vaccinee.push(Vaccinee(_vaccineeId, _vaccineeName, vaccineStatus.NOT_VACCINATED));
@@ -33,6 +33,7 @@ contract VaccineData {
 
         }
 
+        // Update status after the person get vaccinated
         function updateVaccineStatus(uint _index, vaccineStatus _statVac) public {
 
                 Vaccinee storage vacc = vaccinee[_index];
@@ -41,6 +42,8 @@ contract VaccineData {
                 emit updatevacc(vacc.vaccineeId, vacc.vaccineeName, vacc.statVac);
         }
 
+
+        //Check if the data of a person exist in vaccination record
         function checkVaccinee(string memory _vaccineeId) public view returns (bool) {
 
                 bool exist;
@@ -62,6 +65,7 @@ contract VaccineData {
 
         }
 
+        // Get vaccination status of a person
         function getVaccineStat(string memory _vaccineeId) public view returns (uint) {
 
                 
