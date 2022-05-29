@@ -17,11 +17,12 @@ contract Reservation {
          uint private duration;
          bool private isFilled;
          address payable private hotel;
-         address vacDatAddr = 0xa131AD247055FD2e2aA8b156A11bdEc81b9eAD95;
-         address tknAddr = 0x99CF4c4CAE3bA61754Abd22A8de7e8c7ba3C196d;
+         address vacDatAddr = 0xB302F922B24420f3A3048ddDC4E2761CE37Ea098;
+         address guestAddr = 0xf8e81D47203A594245E36C48e151709F0C19fBe8;
+         address tknAddr = 0xd7B63981A38ACEB507354DF5b51945bacbe28414;
          VaccineData _vacdata = VaccineData(vacDatAddr);
          HotelToken _hotelTkn = HotelToken(tknAddr);
-         GuestData _guestdata = new GuestData();
+         GuestData _guestdata = GuestData(guestAddr);
         
          event bookdata(string Guest_Id, string Guest_Name, uint Check_In_Date, uint Check_Out_Date);
          event reserve(string Guest_Id, string Guest_Name, string Booking_Code, uint HTK);
