@@ -37,6 +37,7 @@ contract Reservation {
         }
 
 
+        // Fill booking form
         function setBookData(string memory _guestId, string memory _guestName, uint _checkInDate, uint _checkOutDate) public {
 
             if ((keccak256(abi.encodePacked(_guestId)) != keccak256(abi.encodePacked(guestId))) && isFilled) {
@@ -88,7 +89,7 @@ contract Reservation {
                     emit bookdata(guestId, guestName, _checkInDate, _checkOutDate);
          }
 
-            
+         // Get vaccine status of the guest   
          function getVaccStat() public view returns (string memory) {
 
                 string memory stat;
@@ -100,23 +101,24 @@ contract Reservation {
 
          }
 
+        // Check if any room is available
          modifier checkRoom() {
              require (rooms != 0, "Rooms Full Booked");
              _;
          }
-
+        // Check if booking form has been filled
          modifier checkisFilled() {
              require (isFilled, "Please Fill Booking Data First");
              _;
          }
-
+        // Check if the guest has been vaccinated
          modifier checkVaccStat() {
              require (vaccineStat != 0, "You Are Not Vaccinated");
              _;
          }      
 
         
-
+        // Generate booking code
         function generateBookingCode(uint _index) private pure returns (string memory) {
 
               string[10] memory code1 = ["G-A001","G-B002","G-C125","G-X337","G-J940",
@@ -126,7 +128,7 @@ contract Reservation {
 
         }
 
-
+        // Make a booking
          function bookRoom() public checkRoom checkisFilled checkVaccStat {
 
              string memory bookCode;
@@ -144,14 +146,17 @@ contract Reservation {
                 
          }
 
+         // Get total rooms remaining
          function getAvailableRooms() public view returns (uint) {
              return rooms;
          }
 
+        // Get the total of HTK token has to be transferred by guest
          function getTotalHTK() public view returns (uint) {
              return HTK;
          }
 
+        // Checkout can only be done by hotel admin
          function checkOut() public {
 
              require(msg.sender == hotel, "You Are Not Hotel Admin");
