@@ -23,6 +23,8 @@ contract GuestData {
 
          Guest[] public guest;
 
+
+        //Record guest and booking data derived from Reservation contract
         function inputGuest(uint _bookTime, string memory _guestId, string memory _guestName, string memory _bookCode, address _addr) external {
 
              guestCount++;
@@ -51,5 +53,6 @@ contract GuestData {
 
              return guest[guest.length - 1].bookTime;
          }
+
          
 }
