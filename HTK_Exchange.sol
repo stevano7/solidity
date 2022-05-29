@@ -26,6 +26,7 @@ contract HTKExchange {
     }
 
 
+    // Buy HTK token
     function buyHTK(uint HTK) payable public {
 
         totalPay = HTK * HTKPrice;
@@ -37,6 +38,7 @@ contract HTKExchange {
 
     }
 
+    // Check balance of HTK
     function checkHTKBalance() public view returns (uint256) {
 
         return _hotelTkn.balanceOf(msg.sender);
