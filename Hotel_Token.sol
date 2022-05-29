@@ -20,6 +20,7 @@ contract HotelToken is ERC20 {
         _burn(msg.sender, amount);
     }
 
+    // Transfer token
     function trfToken(address from, address to, uint amount) external {
         _transfer(from, to, amount);
     }
