@@ -13,9 +13,9 @@ After the requirement passed and they complete the payment, then the reservation
 
 Business Flow
 -------------
-1.A person has to get vaccinated first before booking a hotel
-2.In the booking process, one has to fill in the booking form with some data beforehand (ID number, name, check-in date, check-out date)
-3.This booking will be paid using HTK (Hotel Token), so one must have enough HTK to pay the hotel. If they don't have any HTK, they can buy HTK on "HTK Exchange"
-4.When a person makes a booking, the contract will check if any room is available 
-5.This contract will call the Vaccine_Data contract to check if the person has already got vaccinated or not based on the ID number.
-6.If all of the condition is fulfilled and the payment is successful, then the booking process is done, and the guest will receive the booking code.
+1. A person has to get vaccinated first before booking a hotel
+2. In the booking process, one has to fill in the booking form with some data beforehand (ID number, name, check-in date, check-out date)
+3. This booking will be paid using HTK (Hotel Token), so one must have enough HTK to pay the hotel. If they don't have any HTK, they can buy HTK on "HTK Exchange"
+4. When a person makes a booking, the contract will check if any room is available 
+5. This contract will call the Vaccine_Data contract to check if the person has already got vaccinated or not based on the ID number.
+6. If all of the condition is fulfilled and the payment is successful, then the booking process is done, and the guest will receive the booking code.
