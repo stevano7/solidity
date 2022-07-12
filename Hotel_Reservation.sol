@@ -2,40 +2,33 @@
 pragma solidity ^0.7.0;
 
 import "./Vaccine_Data.sol";
-import "./Guest_Data.sol";
-import "./Hotel_Token.sol";
 
 contract Reservation {
 
          uint private rooms;
          uint private guestCount;
-         uint private token;
-         uint private HTK;
+         uint private rate;
+         uint private totRate;
          string public guestId;
          string public guestName;
          uint private vaccineStat;
          uint private duration;
          bool private isFilled;
          address payable private hotel;
-         address vacDatAddr = 0xB302F922B24420f3A3048ddDC4E2761CE37Ea098;
-         address guestAddr = 0xf8e81D47203A594245E36C48e151709F0C19fBe8;
-         address tknAddr = 0xd7B63981A38ACEB507354DF5b51945bacbe28414;
+         address vacDatAddr = 0xa131AD247055FD2e2aA8b156A11bdEc81b9eAD95;
          VaccineData _vacdata = VaccineData(vacDatAddr);
-         HotelToken _hotelTkn = HotelToken(tknAddr);
-         GuestData _guestdata = GuestData(guestAddr);
         
          event bookdata(string Guest_Id, string Guest_Name, uint Check_In_Date, uint Check_Out_Date);
-         event reserve(string Guest_Id, string Guest_Name, string Booking_Code, uint HTK);
+         event reserve(string Guest_Id, string Guest_Name, string Booking_Code);
         
 
-        constructor(uint _rooms, uint _token) {
+        constructor(uint _rooms, uint _rate) {
             rooms = _rooms;
-            token = _token;
+            rate = _rate;
             hotel = msg.sender;
             guestCount = 0;
             isFilled = false;
         }
-
 
         // Fill booking form
         function setBookData(string memory _guestId, string memory _guestName, uint _checkInDate, uint _checkOutDate) public {
@@ -83,13 +76,13 @@ contract Reservation {
                     guestName = _guestName;
                     vaccineStat = _vacdata.getVaccineStat(_guestId); 
                     duration = _checkOutDate - _checkInDate;
-                    HTK = token * duration;        
+                    totRate = rate * duration;     
                     isFilled = true;
 
                     emit bookdata(guestId, guestName, _checkInDate, _checkOutDate);
          }
 
-         // Get vaccine status of the guest   
+         // Get vaccine status of the guest     
          function getVaccStat() public view returns (string memory) {
 
                 string memory stat;
@@ -106,11 +99,13 @@ contract Reservation {
              require (rooms != 0, "Rooms Full Booked");
              _;
          }
+
         // Check if booking form has been filled
          modifier checkisFilled() {
              require (isFilled, "Please Fill Booking Data First");
              _;
          }
+
         // Check if the guest has been vaccinated
          modifier checkVaccStat() {
              require (vaccineStat != 0, "You Are Not Vaccinated");
@@ -129,31 +124,30 @@ contract Reservation {
         }
 
         // Make a booking
-         function bookRoom() public checkRoom checkisFilled checkVaccStat {
+         function bookRoom() payable public checkRoom checkisFilled checkVaccStat {
 
              string memory bookCode;
 
-                 require((_hotelTkn.balanceOf(msg.sender)) >= HTK, "Not Enough HTK");
-                _hotelTkn.trfToken(msg.sender, hotel, HTK);
+                require(msg.value >= totRate, "Not Enough Balance");
+                     hotel.transfer(msg.value);
                           
                 rooms--;
                 bookCode = generateBookingCode(guestCount);
                 isFilled = false;
-                _guestdata.inputGuest(block.timestamp, guestId, guestName, bookCode, msg.sender);
                 guestCount++;
-                 emit reserve(guestId, guestName, bookCode, HTK);
+                 emit reserve(guestId, guestName, bookCode);
 
                 
          }
 
-         // Get total rooms remaining
+        // Get total rooms remaining
          function getAvailableRooms() public view returns (uint) {
              return rooms;
          }
 
-        // Get the total of HTK token has to be transferred by guest
-         function getTotalHTK() public view returns (uint) {
-             return HTK;
+        // Get the total rate that has to be paid by guest
+         function getTotRate() public view returns (uint) {
+             return totRate;
          }
 
         // Checkout can only be done by hotel admin
